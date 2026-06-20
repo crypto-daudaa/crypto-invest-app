@@ -1,142 +1,114 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Investment Platform</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crypto Investment Dashboard</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+}
+
+.container {
+    max-width: 450px;
+    margin: 60px auto;
+    padding: 20px;
+    background: #1e293b;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+}
+
+h1 {
+    text-align: center;
+    color: #38bdf8;
+    margin-bottom: 20px;
+}
+
+.balance {
+    text-align: center;
+    font-size: 26px;
+    font-weight: bold;
+    margin: 20px 0;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.deposit {
+    background: #22c55e;
+    color: white;
+}
+
+.withdraw {
+    background: #ef4444;
+    color: white;
+}
+</style>
 </head>
 
-<body style="font-family:Arial; background:#0f172a; color:white; text-align:center; padding:20px;">
+<body>
 
-<!-- LOGIN PAGE -->
-<div id="loginPage">
-  <h1 style="color:#22c55e;">Welcome Back</h1>
+<div class="container">
+    <h1>Investment Dashboard</h1>
 
-  <input id="user" placeholder="Username" style="padding:10px; width:200px;"><br><br>
-  <input id="pass" type="password" placeholder="Password" style="padding:10px; width:200px;"><br><br>
+    <div class="balance">
+        Balance: $<span id="balance">0</span>
+    </div>
 
-  <button onclick="login()" style="padding:10px 20px; background:green; color:white;">
-    Login
-  </button>
+    <input type="number" id="amount" placeholder="Enter amount">
 
-  <p id="msg"></p>
-</div>
-
-<!-- DASHBOARD -->
-<div id="dashboard" style="display:none;">
-
-  <h1 style="color:#22c55e;">Investment Dashboard</h1>
-
-  <h2>Balance: <span id="balance"></span></h2>
-
-  <button onclick="deposit()" style="padding:10px; background:green; color:white;">Deposit 100</button>
-  <button onclick="withdraw()" style="padding:10px; background:red; color:white;">Withdraw 100</button>
-
-  <hr>
-
-  <h2>Investment Plans</h2>
-
-  <div style="background:#1e293b; padding:10px; margin:10px;">
-    Basic Plan - 10% Profit
-  </div>
-
-  <div style="background:#1e293b; padding:10px; margin:10px;">
-    VIP Plan - 20% Profit
-  </div>
-
-  <div style="background:#1e293b; padding:10px; margin:10px;">
-    Pro Plan - 30% Profit
-  </div>
-
-  <hr>
-
-  <h2>Profit Calculator</h2>
-
-  <input id="amount" type="number" placeholder="Enter amount" style="padding:10px;">
-  <br><br>
-
-  <button onclick="calc()" style="padding:10px 20px; background:#22c55e; color:white;">
-    Calculate
-  </button>
-
-  <h3 id="result"></h3>
-
-  <br>
-
-  <button onclick="logout()" style="background:red; padding:10px; color:white;">
-    Logout
-  </button>
-
+    <button class="deposit" onclick="deposit()">Deposit</button>
+    <button class="withdraw" onclick="withdraw()">Withdraw</button>
 </div>
 
 <script>
-  // AUTO LOGIN CHECK
-  if (localStorage.getItem("loggedIn") === "true") {
-    document.getElementById("loginPage").style.display = "none";
-    document.getElementById("dashboard").style.display = "block";
-  }
+let balance = 0;
 
-  // BALANCE
-  let balance = localStorage.getItem("balance");
-  if (!balance) balance = 1000;
-  else balance = Number(balance);
-
-  function showBalance() {
+function updateBalance() {
     document.getElementById("balance").innerText = balance;
-    localStorage.setItem("balance", balance);
-  }
+}
 
-  showBalance();
-
-  // LOGIN
-  function login() {
-    let u = document.getElementById("user").value;
-    let p = document.getElementById("pass").value;
-
-    if (u === "admin" && p === "1234") {
-      localStorage.setItem("loggedIn", "true");
-      document.getElementById("loginPage").style.display = "none";
-      document.getElementById("dashboard").style.display = "block";
+function deposit() {
+    let amount = Number(document.getElementById("amount").value);
+    if (amount > 0) {
+        balance += amount;
+        updateBalance();
     } else {
-      document.getElementById("msg").innerText = "Wrong login details";
+        alert("Enter a valid amount");
     }
-  }
+}
 
-  // LOGOUT
-  function logout() {
-    localStorage.removeItem("loggedIn");
-    document.getElementById("loginPage").style.display = "block";
-    document.getElementById("dashboard").style.display = "none";
-  }
-
-  // DEPOSIT
-  function deposit() {
-    balance += 100;
-    showBalance();
-  }
-
-  // WITHDRAW
-  function withdraw() {
-    if (balance >= 100) {
-      balance -= 100;
-      showBalance();
+function withdraw() {
+    let amount = Number(document.getElementById("amount").value);
+    if (amount > 0 && amount <= balance) {
+        balance -= amount;
+        updateBalance();
     } else {
-      alert("Not enough balance");
+        alert("Invalid or insufficient balance");
     }
-  }
+}
 
-  // CALCULATOR
-  function calc() {
-    let a = document.getElementById("amount").value;
-
-    if (!a || a <= 0) {
-      document.getElementById("result").innerText = "Enter valid amount";
-      return;
-    }
-
-    let profit = Number(a) * 0.2;
-
-    document.getElementById("result").innerText =
-      "Profit: " + profit;
-  }
+updateBalance();
 </script>
 
 </body>
