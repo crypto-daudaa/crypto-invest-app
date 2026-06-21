@@ -1,38 +1,70 @@
-<!DOCTYPE html>
+DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crypto Investment Dashboard</title>
+<title>Crypto Pro Dashboard</title>
 
 <style>
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #0f172a;
+    background: #0b1220;
     color: white;
 }
 
-.container {
-    max-width: 450px;
-    margin: 60px auto;
+/* LOGIN */
+.login {
+    max-width: 350px;
+    margin: 100px auto;
+    background: #111a2e;
     padding: 20px;
-    background: #1e293b;
     border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    text-align: center;
+}
+
+.login input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 6px;
+}
+
+.login button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background: #22c55e;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+/* DASHBOARD */
+.container {
+    display: none;
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.card {
+    background: #111a2e;
+    padding: 20px;
+    border-radius: 12px;
 }
 
 h1 {
     text-align: center;
     color: #38bdf8;
-    margin-bottom: 20px;
 }
 
 .balance {
     text-align: center;
-    font-size: 26px;
-    font-weight: bold;
+    font-size: 28px;
     margin: 20px 0;
+    font-weight: bold;
 }
 
 input {
@@ -41,7 +73,6 @@ input {
     margin-top: 10px;
     border: none;
     border-radius: 6px;
-    font-size: 16px;
 }
 
 button {
@@ -50,65 +81,108 @@ button {
     margin-top: 10px;
     border: none;
     border-radius: 6px;
-    font-size: 16px;
     cursor: pointer;
 }
 
-.deposit {
-    background: #22c55e;
-    color: white;
-}
+.deposit { background: #22c55e; color: white; }
+.withdraw { background: #ef4444; color: white; }
 
-.withdraw {
-    background: #ef4444;
-    color: white;
+.history {
+    margin-top: 20px;
+    font-size: 14px;
+    max-height: 150px;
+    overflow-y: auto;
+    background: #0b1220;
+    padding: 10px;
+    border-radius: 8px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-    <h1>Investment Dashboard</h1>
+<!-- LOGIN -->
+<div class="login" id="loginBox">
+    <h2>Login</h2>
+    <input type="text" id="user" placeholder="Username">
+    <input type="password" id="pass" placeholder="Password">
+    <button onclick="login()">Login</button>
+</div>
 
-    <div class="balance">
-        Balance: $<span id="balance">0</span>
+<!-- DASHBOARD -->
+<div class="container" id="dashboard">
+    <div class="card">
+
+        <h1>Crypto Dashboard</h1>
+
+        <div class="balance">
+            Balance: $<span id="balance">0</span>
+        </div>
+
+        <input type="number" id="amount" placeholder="Enter amount">
+
+        <button class="deposit" onclick="deposit()">Deposit</button>
+        <button class="withdraw" onclick="withdraw()">Withdraw</button>
+
+        <div class="history" id="history"></div>
+
     </div>
-
-    <input type="number" id="amount" placeholder="Enter amount">
-
-    <button class="deposit" onclick="deposit()">Deposit</button>
-    <button class="withdraw" onclick="withdraw()">Withdraw</button>
 </div>
 
 <script>
-let balance = 0;
+let balance = Number(localStorage.getItem("balance")) || 0;
+let history = JSON.parse(localStorage.getItem("history")) || [];
 
-function updateBalance() {
+function login() {
+    let u = document.getElementById("user").value;
+    let p = document.getElementById("pass").value;
+
+    if (u && p) {
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+        update();
+    } else {
+        alert("Enter username and password");
+    }
+}
+
+function update() {
     document.getElementById("balance").innerText = balance;
+
+    let h = document.getElementById("history");
+    h.innerHTML = "";
+
+    history.slice().reverse().forEach(item => {
+        h.innerHTML += "<div>" + item + "</div>";
+    });
+
+    localStorage.setItem("balance", balance);
+    localStorage.setItem("history", JSON.stringify(history));
 }
 
 function deposit() {
-    let amount = Number(document.getElementById("amount").value);
-    if (amount > 0) {
-        balance += amount;
-        updateBalance();
-    } else {
-        alert("Enter a valid amount");
+    let amt = Number(document.getElementById("amount").value);
+
+    if (amt > 0) {
+        balance += amt;
+        history.push("Deposited +$" + amt);
+        update();
     }
 }
 
 function withdraw() {
-    let amount = Number(document.getElementById("amount").value);
-    if (amount > 0 && amount <= balance) {
-        balance -= amount;
-        updateBalance();
+    let amt = Number(document.getElementById("amount").value);
+
+    if (amt > 0 && amt <= balance) {
+        balance -= amt;
+        history.push("Withdrew -$" + amt);
+        update();
     } else {
-        alert("Invalid or insufficient balance");
+        alert("Invalid amount");
     }
 }
 
-updateBalance();
+update();
 </script>
 
 </body>
